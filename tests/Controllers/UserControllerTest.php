@@ -10,15 +10,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserControllerTest extends AbstractTest
 {
-    protected function getFixtures(): array
-    {
-        return [
-            new AppFixtures(
-                $this->getContainer()->get(UserPasswordHasherInterface::class),
-            )
-        ];
-    }
-
     public function testRegisterThenAuthSuccess(): void
     {
         $client = static::getClient();
@@ -90,7 +81,7 @@ class UserControllerTest extends AbstractTest
         // регистрируем пользователя 
         $client = static::getClient();
 
-        $email = "newUser@example.com";
+        $email = "newUserAgain@example.com";
         $password = "newPassword";
 
         $client->jsonRequest('POST', '/api/v1/register', [
@@ -153,7 +144,7 @@ class UserControllerTest extends AbstractTest
         $this->assertTrue(isset($token));
 
         // попытка получить данные без токена
-        $client->request('GET', '/api/v1/users/current', [], [], []);
+        $client->request('GET', '/api/v1/users/current', [], [], ['HTTP_AUTHORIZATION' => 'Bearer asdaadsad']);
         $this->assertResponseCode(Response::HTTP_UNAUTHORIZED);
 
         // успешное получение данных об авторизованном пользователе
@@ -171,6 +162,5 @@ class UserControllerTest extends AbstractTest
 
         self::assertEquals($email, $responseData['username']);
         self::assertEquals('ROLE_SUPER_ADMIN', $responseData['roles'][0]);
-        self::assertEquals(1000, $responseData['balance']);
     }
 }

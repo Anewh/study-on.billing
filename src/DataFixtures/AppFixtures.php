@@ -28,7 +28,18 @@ class AppFixtures extends Fixture
             'type' => 2,
             'price' => 20,
             'name' => 'Молекулярная физика и термодинамика',
+        ], [
+            'code' => 'richcourse',
+            'type' => 1,
+            'price' => 100,
+            'name' => 'Очень дорогой курс, который никто не покупает сразу же'
+        ], [
+            'code' => 'other',
+            'type' => 1,
+            'price' => 100,
+            'name' => 'Очередной курс для тестов'
         ]
+
     ];
 
     private UserPasswordHasherInterface $userPasswordHashed;
@@ -64,7 +75,7 @@ class AppFixtures extends Fixture
             ->setEmail('admin@example.com')
             ->setPassword($password)
             ->setRoles(['ROLE_SUPER_ADMIN'])
-            ->setBalance(1000.0);
+            ->setBalance(10.0);
 
         $manager->persist($admin);
 

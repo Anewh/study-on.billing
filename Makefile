@@ -22,7 +22,7 @@ fixtload:
 	@${CONSOLE} doctrine:fixtures:load
 
 phpunit:
-	@${PHP} bin/phpunit
+	@${PHP} bin/console d:f:l --env=test -n && ${PHP} bin/phpunit
 # В файл local.mk можно добавлять дополнительные make-команды,
 # которые требуются лично вам, но не нужны на проекте в целом
 -include local.mk
