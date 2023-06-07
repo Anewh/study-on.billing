@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Dto;
+
+use App\Enum\CourseType;
+use JMS\Serializer\Annotation as Serializer;
+use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class CourseDto
+{
+    /**
+     * @Serializer\Groups({"info", "new_edit"})
+     * @Assert\NotNull(groups={"new_edit"})
+     */
+    private string $code;
+
+    /**
+     * @OA\Property(type="string")
+     * @Serializer\Groups({"info", "new_edit"})
+     * @Assert\NotNull(groups={"new_edit"})
+     * @Assert\Choice(choices=CourseType::NAMES, groups={"new_edit"})
+     */
+    private string $type;
+
+    /**
+     * @Serializer\Groups({"info", "new_edit"})
+     */
+    private float $price = 0.0;
+
+    private string $name;
+    /**
+     * @return string
+     */
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $code
+     */
+    public function setCode(string $code): void
+    {
+        $this->code = $code;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param float $price
+     */
+    public function setPrice(float $price): void
+    {
+        $this->price = $price;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+
+    }
+}

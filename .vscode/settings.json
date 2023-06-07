@@ -2,11 +2,11 @@
     "sqltools.connections": [
         {
             "previewLimit": 50,
-            "server": "172.19.0.2",
+            "server": "172.19.0.5",
             "port": 5432,
             "driver": "PostgreSQL",
             "name": "billing.study-on",
-            "database": "study_on_test",
+            "database": "study_on",
             "username": "pguser"
         }
     ]

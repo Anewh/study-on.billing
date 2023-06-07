@@ -4,6 +4,7 @@ volumes:
 services:
   nginx:
     image: nginx:alpine
+    container_name: billing.study-on.local
     working_dir: /app
     volumes:
       - ${PWD}:/app
@@ -31,3 +32,10 @@ services:
       - COMPOSER_ALLOW_SUPERUSER=1
     links:
       - postgres
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: 'mailhog'
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025

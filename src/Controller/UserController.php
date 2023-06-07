@@ -5,10 +5,11 @@ namespace App\Controller;
 use App\Dto\UserDto;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -95,6 +96,22 @@ class UserController extends AbstractController
      *        ),
      *     )
      * )
+     * @OA\Response(
+     *     response=400,
+     *     description="Bad request",
+     *     @OA\JsonContent(
+     *        @OA\Property(
+     *          property="code",
+     *          type="string",
+     *          example="400"
+     *        ),
+     *        @OA\Property(
+     *          property="message",
+     *          type="string",
+     *          example="Bad request"
+     *        ),
+     *     )
+     * )
      * @OA\Tag(name="User")
      */
     #[Route('/v1/auth', name: 'api_v1_auth', methods: ['POST'])]
@@ -162,19 +179,19 @@ class UserController extends AbstractController
      * )
      * @OA\Response(
      *     response=409,
-     *     description="Email already exists",
+     *     description="User with presented email already exist",
      *     @OA\JsonContent(
      *        @OA\Property(
      *          property="error",
      *          type="string",
-     *          example="Email already exists",
+     *          example="User with presented email already exist",
      *        ),
      *     ),
      * )
      * @OA\Tag(name="User")
      */
     #[Route('/v1/register', name: 'api_v1_register', methods: ['POST'])]
-    public function register(Request $request): JsonResponse
+    public function register(Request $request, RefreshTokenGeneratorInterface $refreshTokenGenerator, RefreshTokenManagerInterface $refreshTokenManager): JsonResponse
     {
         $userDto = $this->serializer->deserialize(
             $request->getContent(),
@@ -185,7 +202,8 @@ class UserController extends AbstractController
         $errors = $this->validator->validate($userDto);
         if ($errors->count() > 0) {
             return new JsonResponse(
-                ['errors' => (string)$errors],
+                //['errors' => (string)$errors],
+                ['errors' => ['Bad request']],
                 Response::HTTP_BAD_REQUEST
             );
         }
@@ -205,17 +223,21 @@ class UserController extends AbstractController
         );
 
         $this->entityManager->getRepository(User::class)->save($user, true);
+        $refreshToken = $refreshTokenGenerator->createForUserWithTtl($user, (new \DateTime())->modify('+1 month')->getTimestamp());
+        $refreshTokenManager->save($refreshToken);
 
         return new JsonResponse([
             'token' => $this->jwtManager->create($user),
             'roles' => $user->getRoles(),
+            'refresh_token' => $refreshToken->getRefreshToken()
         ], Response::HTTP_CREATED);
     }
 
     /**
      * @OA\Get(
      *     description="Get user data by JWT",
-     *     tags={"user"}
+     *     summary="Get user data by JWT",
+     *     tags={"User"}
      * )
      * @OA\Response(
      *     response=200,
@@ -273,5 +295,42 @@ class UserController extends AbstractController
             'roles' => $user->getRoles(),
             'balance' => $user->getBalance(),
         ], Response::HTTP_OK);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/token/refresh",
+     *     description="Get new valid JWT token",
+     *     tags={"User"},
+     * @OA\RequestBody(
+     *      @OA\JsonContent(
+     *          type="object",
+     *          @OA\Property(
+     *              property="refresh_token", 
+     *              type="string"
+     *          )
+     *      )
+     * ),
+     * @OA\Response(
+     *      response=200,
+     *      description="JWT token",
+     *      @OA\JsonContent(
+     *          type="object",
+     *          @OA\Property(
+     *              property="token", 
+     *              type="string"
+     *          ),
+     *          @OA\Property(
+     *              property="refresh_token", 
+     *              type="string"
+     *          )
+     *       )
+     *    )
+     * )
+     */
+    #[Route('/v1/token/refresh', name: 'api_v1_refresh_token', methods: ['POST'])]
+    public function refreshToken()
+    {
+        throw new \RuntimeException();
     }
 }
