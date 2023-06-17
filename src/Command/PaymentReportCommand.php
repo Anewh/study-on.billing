@@ -76,7 +76,7 @@ class PaymentReportCommand extends Command
 
             $email = (new Email())
                 ->to($email)
-                ->subject('Окончание аренды курсов')
+                ->subject('Отчет об оплаченных курсах')
                 ->html($html);
 
             try {

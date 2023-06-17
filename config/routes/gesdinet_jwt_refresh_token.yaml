@@ -1,2 +1,7 @@
+# api_v1_refresh_token:
+#     path: /api/v1/token/refresh
+#     controller: App\Controller\UserController::refreshToken
+
 gesdinet_jwt_refresh_token:
-    path: /api/token/refresh
+    path: /api/v1/token/refresh
+    methods: POST

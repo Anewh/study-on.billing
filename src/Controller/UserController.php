@@ -120,6 +120,55 @@ class UserController extends AbstractController
         return new JsonResponse(status: Response::HTTP_OK);
     }
 
+     /**
+     * @OA\Post(
+     *     path="/api/v1/token/refresh",
+     *     description="Get new valid JWT token",
+     *     tags={"User"},
+     * @OA\RequestBody(
+     *      @OA\JsonContent(
+     *          type="object",
+     *          @OA\Property(
+     *              property="refresh_token", 
+     *              type="string"
+     *          )
+     *      )
+     * ),
+     * @OA\Response(
+     *      response=200,
+     *      description="JWT token",
+     *      @OA\JsonContent(
+     *          type="object",
+     *          @OA\Property(
+     *              property="token", 
+     *              type="string"
+     *          ),
+     *          @OA\Property(
+     *              property="refresh_token", 
+     *              type="string"
+     *          )
+     *       )
+     *    )
+     * )
+     * Managed by lexik/jwt-authentication-bundle. Used for only OA doc
+     */
+    // #[Route('/v1/token/refresh', name: 'api_v1_refresh_token', methods: ['POST'])]
+    // public function refreshToken()
+    // {
+    //     return new JsonResponse(status: Response::HTTP_OK);
+    //     //dd();
+    //     //throw new \RuntimeException();
+    // }
+
+
+
+
+    #[Route('/v1/token/refresh', name: 'api_refresh_token', methods: ['POST'])]
+    public function refresh()
+    {
+    }
+
+
     /**
      * @OA\Post(
      *     path="/api/v1/register",
@@ -280,8 +329,10 @@ class UserController extends AbstractController
      * @Security(name="Bearer")
      */
     #[Route('/v1/users/current', name: 'api_v1_user_get', methods: ['GET'])]
-    public function getCurrentUser(#[CurrentUser] ?User $user): JsonResponse
+    public function getCurrentUser(#[CurrentUser] ?User $user,  RefreshTokenGeneratorInterface $refreshTokenGenerator): JsonResponse
     {
+        //$refreshToken = $refreshTokenGenerator->createForUserWithTtl($user, (new \DateTime())->modify('+1 month')->getTimestamp());
+        //$this->tokenStorageInterface->setToken($refreshToken->getRefreshToken());
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
         if (!$user) {
             return new JsonResponse(
@@ -295,42 +346,5 @@ class UserController extends AbstractController
             'roles' => $user->getRoles(),
             'balance' => $user->getBalance(),
         ], Response::HTTP_OK);
-    }
-
-    /**
-     * @OA\Post(
-     *     path="/api/v1/token/refresh",
-     *     description="Get new valid JWT token",
-     *     tags={"User"},
-     * @OA\RequestBody(
-     *      @OA\JsonContent(
-     *          type="object",
-     *          @OA\Property(
-     *              property="refresh_token", 
-     *              type="string"
-     *          )
-     *      )
-     * ),
-     * @OA\Response(
-     *      response=200,
-     *      description="JWT token",
-     *      @OA\JsonContent(
-     *          type="object",
-     *          @OA\Property(
-     *              property="token", 
-     *              type="string"
-     *          ),
-     *          @OA\Property(
-     *              property="refresh_token", 
-     *              type="string"
-     *          )
-     *       )
-     *    )
-     * )
-     */
-    #[Route('/v1/token/refresh', name: 'api_v1_refresh_token', methods: ['POST'])]
-    public function refreshToken()
-    {
-        throw new \RuntimeException();
     }
 }

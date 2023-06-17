@@ -21,17 +21,25 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-        api:
-            pattern:   ^/api/v1
-            stateless: true
-            jwt: ~
-
         api_token_refresh:
             pattern: ^/api/v1/token/refresh
             stateless: true
             provider: app_user_provider
             refresh_jwt:
-                check_path: /api/v1/token/refresh
+                check_path: gesdinet_jwt_refresh_token
+
+        api:
+            pattern: ^/api/v1
+            stateless: true
+            jwt: ~
+
+
+        # api_token_refresh:
+        #     pattern: ^/api/v1/token/refresh
+        #     stateless: true
+        #     provider: app_user_provider
+        #     refresh_jwt:
+        #         check_path: /api/v1/token/refresh
         # main:
             # lazy: true
             # provider: app_user_provider
@@ -49,6 +57,7 @@ security:
         # - { path: ^/api/v1/(auth|register), roles: PUBLIC_ACCESS }
         # - { path: ^/api/v1/, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/v1/(auth|register|doc|token/refresh), roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS }
 
 when@test:
     security:
